@@ -7,13 +7,14 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 
 class ViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
 
-    override fun getItemCount(): Int = 3
+    override fun getItemCount(): Int = 4
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             0 -> RegistrationTab()
             1 -> RuleTab()
             2 -> AuthorsTab()
+            3 -> SettingsTab()
             else -> throw IllegalArgumentException("Invalid position: $position")
         }
     }

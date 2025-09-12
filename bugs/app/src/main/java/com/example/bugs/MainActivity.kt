@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
                 0 -> "Регистрация"
                 1 -> "Правила"
                 2 -> "Авторы"
+                3 -> "Настройки"
                 else -> "Таб $position"
             }
         }.attach()
