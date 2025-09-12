@@ -40,7 +40,8 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.androidx.viewpager2)
+    implementation(libs.material)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
