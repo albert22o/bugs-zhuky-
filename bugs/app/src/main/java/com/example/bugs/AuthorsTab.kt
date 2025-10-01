@@ -50,7 +50,7 @@ class AuthorsTab : Fragment() {
     private fun getAuthorsList(): List<Author> {
         return listOf(
             Author("Оганесян Альберт Самвелович", R.drawable.ic_person),
-            Author("Лацук Андрей Юрич", R.drawable.ic_person),
+            Author("Лацук Андрей Юрьевич", R.drawable.ic_person),
         )
     }
 }

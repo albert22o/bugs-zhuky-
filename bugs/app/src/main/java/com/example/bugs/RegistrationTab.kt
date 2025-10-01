@@ -1,15 +1,21 @@
 package com.example.bugs
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
 class RegistrationTab : Fragment() {
+
+
+    private lateinit var playerManager: PlayerManager
 
     private lateinit var editTextName: EditText
     private lateinit var radioGroupGender: RadioGroup
@@ -21,12 +27,16 @@ class RegistrationTab : Fragment() {
     private lateinit var imageViewZodiac: ImageView
     private lateinit var textDifficultyLabel: TextView
 
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.tab_registration, container, false)
+
+        // Инициализация PlayerManager с контекстом фрагмента
+        playerManager = PlayerManager(requireContext())
 
         // Инициализация view
         editTextName = view.findViewById(R.id.editTextName)
@@ -91,6 +101,28 @@ class RegistrationTab : Fragment() {
             val birthDateStr = sdf.format(Date(birthDateMillis))
             val zodiac = getZodiac(birthDateMillis)
 
+            // ----- ИЗМЕНЕНИЯ ЗДЕСЬ -----
+
+            // 1. Создаем объект Player
+            val newPlayer = Player(
+                name = name,
+                gender = gender,
+                course = course,
+                difficulty = difficulty,
+                birthDate = birthDateStr,
+                zodiac = zodiac,
+                bestScore = 0 // У нового игрока начальный счет 0
+            )
+
+            // 2. Запускаем корутину для добавления игрока в БД
+            viewLifecycleOwner.lifecycleScope.launch {
+                playerManager.addPlayer(newPlayer)
+
+                // 3. Показываем сообщение об успехе
+                Toast.makeText(requireContext(), "Игрок $name добавлен!", Toast.LENGTH_SHORT).show()
+            }
+
+            // Можно оставить для немедленного отображения данных на экране
             textViewResult.text = """
                 ФИО: $name
                 Пол: $gender
@@ -114,17 +146,17 @@ class RegistrationTab : Fragment() {
 
         return when {
             (month == 3 && day >= 21) || (month == 4 && day <= 19) -> "Овен"
-            (month == 4 && day >= 20) || (month == 5 && day <= 20) -> "Телец"
-            (month == 5 && day >= 21) || (month == 6 && day <= 20) -> "Близнецы"
-            (month == 6 && day >= 21) || (month == 7 && day <= 22) -> "Рак"
-            (month == 7 && day >= 23) || (month == 8 && day <= 22) -> "Лев"
-            (month == 8 && day >= 23) || (month == 9 && day <= 22) -> "Дева"
-            (month == 9 && day >= 23) || (month == 10 && day <= 22) -> "Весы"
-            (month == 10 && day >= 23) || (month == 11 && day <= 21) -> "Скорпион"
-            (month == 11 && day >= 22) || (month == 12 && day <= 21) -> "Стрелец"
-            (month == 12 && day >= 22) || (month == 1 && day <= 19) -> "Козерог"
-            (month == 1 && day >= 20) || (month == 2 && day <= 18) -> "Водолей"
-            (month == 2 && day >= 19) || (month == 3 && day <= 20) -> "Рыбы"
+            (month == 4) || (month == 5 && day <= 20) -> "Телец"
+            (month == 5) || (month == 6 && day <= 20) -> "Близнецы"
+            (month == 6) || (month == 7 && day <= 22) -> "Рак"
+            (month == 7) || (month == 8 && day <= 22) -> "Лев"
+            (month == 8) || (month == 9 && day <= 22) -> "Дева"
+            (month == 9) || (month == 10 && day <= 22) -> "Весы"
+            (month == 10) || (month == 11 && day <= 21) -> "Скорпион"
+            (month == 11) || (month == 12 && day <= 21) -> "Стрелец"
+            (month == 12) || (month == 1 && day <= 19) -> "Козерог"
+            (month == 1) || (month == 2 && day <= 18) -> "Водолей"
+            (month == 2) || (month == 3) -> "Рыбы"
             else -> "Неизвестно"
         }
     }
