@@ -1,5 +1,6 @@
 package com.example.bugs
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ListView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.bugs.com.example.bugs.PlayerListAdapter
 import com.example.bugs.managers.PlayerManager
@@ -21,25 +21,22 @@ class PlayerListTab : Fragment() {
 
     private var selectedPlayer: Player? = null
 
+    // ... (onCreateView и onResume остаются без изменений) ...
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_player_list, container, false)
-
         listViewPlayers = view.findViewById(R.id.listViewPlayers)
         buttonPlay = view.findViewById(R.id.buttonPlay)
         textViewEmptyList = view.findViewById(R.id.textViewEmptyList)
-
         setupListeners()
-
         return view
     }
 
     override fun onResume() {
         super.onResume()
-        // Обновляем список каждый раз, когда фрагмент становится видимым
         updatePlayerList()
     }
 
@@ -47,26 +44,22 @@ class PlayerListTab : Fragment() {
         val players = PlayerManager.getPlayers()
 
         if (players.isEmpty()) {
-            // Если список пуст, показываем сообщение и скрываем ListView
             textViewEmptyList.visibility = View.VISIBLE
             listViewPlayers.visibility = View.GONE
         } else {
-            // Если игроки есть, показываем ListView и скрываем сообщение
             textViewEmptyList.visibility = View.GONE
             listViewPlayers.visibility = View.VISIBLE
-
-            // Создаем и устанавливаем адаптер
             val adapter = PlayerListAdapter(requireContext(), players)
             listViewPlayers.adapter = adapter
         }
 
-        // Сбрасываем выбор и скрываем кнопку
         selectedPlayer = null
         buttonPlay.visibility = View.GONE
-        // Сбрасываем подсветку элемента списка, если он был выбран
-        listViewPlayers.clearChoices()
+        // Для сброса выделения в ListView
+        listViewPlayers.adapter?.let {
+            listViewPlayers.setItemChecked(-1, true)
+        }
     }
-
 
 
     private fun setupListeners() {
@@ -82,13 +75,26 @@ class PlayerListTab : Fragment() {
         buttonPlay.setOnClickListener {
             // Проверяем, что игрок выбран
             selectedPlayer?.let { player ->
-                // Логика при нажатии на кнопку "Играть"
-                // Пока что просто выводим сообщение
-                Toast.makeText(
-                    requireContext(),
-                    "Начинаем игру с ${player.name}!",
-                    Toast.LENGTH_SHORT
-                ).show()
+                // Создаем Intent для запуска GameActivity
+                val intent = Intent(activity, GameActivity::class.java).apply {
+                    // 1. Кладем в Intent выбранного игрока
+                    putExtra(GameActivity.EXTRA_PLAYER, player)
+
+                    // 2. Получаем настройки из SharedPreferences через статические методы SettingsTab
+                    val gameSpeed = SettingsTab.getGameSpeed(requireContext())
+                    val maxCockroaches = SettingsTab.getMaxCockroaches(requireContext())
+                    val bonusInterval = SettingsTab.getBonusInterval(requireContext())
+                    val roundDuration = SettingsTab.getRoundDuration(requireContext())
+
+                    // 3. Кладем настройки в Intent
+                    putExtra(GameActivity.EXTRA_GAME_SPEED, gameSpeed)
+                    putExtra(GameActivity.EXTRA_MAX_COCKROACHES, maxCockroaches)
+                    putExtra(GameActivity.EXTRA_BONUS_INTERVAL, bonusInterval)
+                    putExtra(GameActivity.EXTRA_ROUND_DURATION, roundDuration)
+                }
+
+                // Запускаем активность
+                startActivity(intent)
             }
         }
     }

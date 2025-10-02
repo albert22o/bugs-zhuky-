@@ -1,5 +1,7 @@
 package com.example.bugs.models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.util.UUID
 
 /**
@@ -11,6 +13,8 @@ import java.util.UUID
  * @param birthDateMillis Дата рождения в миллисекундах.
  * @param zodiac Знак зодиака.
  */
+
+@Parcelize
 data class Player(
     val id: String = UUID.randomUUID().toString(), // Генерируем уникальный ID для каждого игрока
     val name: String,
@@ -18,4 +22,4 @@ data class Player(
     val course: String,
     val birthDateMillis: Long,
     val zodiac: String
-)
+): Parcelable
