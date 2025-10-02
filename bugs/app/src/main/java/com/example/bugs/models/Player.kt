@@ -21,5 +21,6 @@ data class Player(
     val gender: String,
     val course: String,
     val birthDateMillis: Long,
-    val zodiac: String
+    val zodiac: String,
+    var highScore: Int = 0
 ): Parcelable

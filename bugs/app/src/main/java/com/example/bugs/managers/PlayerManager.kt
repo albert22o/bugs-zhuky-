@@ -1,7 +1,7 @@
 package com.example.bugs.managers
 
-import com.example.bugs.models.Player
 import android.util.Log
+import com.example.bugs.models.Player
 
 /**
  * Синглтон для управления списком зарегистрированных игроков.
@@ -34,5 +34,24 @@ object PlayerManager {
     fun clearPlayers() {
         registeredPlayers.clear()
         Log.i("PlayerManager", "Список игроков очищен.")
+    }
+
+    /**
+     * Обновляет максимальный счет игрока, если новый счет больше предыдущего рекорда.
+     * @param playerName Имя игрока, чей счет нужно обновить.
+     * @param newScore Новый счет, полученный в игре.
+     */
+    fun updatePlayerHighScore(playerName: String, newScore: Int) {
+        val player = registeredPlayers.find { it.name == playerName }
+        if (player != null) {
+            if (newScore > player.highScore) {
+                player.highScore = newScore
+                Log.i("PlayerManager", "Новый рекорд для игрока ${player.name}: $newScore")
+            } else {
+                Log.i("PlayerManager", "Счет игрока ${player.name} ($newScore) не превысил рекорд (${player.highScore})")
+            }
+        } else {
+            Log.w("PlayerManager", "Попытка обновить счет для несуществующего игрока: $playerName")
+        }
     }
 }

@@ -22,7 +22,7 @@ class PlayerListAdapter(context: Context, private val players: List<Player>) :
         val playerName: TextView = view.findViewById(R.id.textViewPlayerName)
         val playerInfo: TextView = view.findViewById(R.id.textViewPlayerInfo)
         val playerZodiacImage: ImageView = view.findViewById(R.id.imageViewPlayerZodiac)
-
+        val playerHighScore: TextView = view.findViewById(R.id.textViewPlayerHighScore)
         // Получаем текущего игрока
         val player = getItem(position)
 
@@ -30,7 +30,7 @@ class PlayerListAdapter(context: Context, private val players: List<Player>) :
             // Заполняем View данными
             playerName.text = player.name
             playerInfo.text = "${player.course}, ${player.gender}"
-
+            playerHighScore.text = "Лучший счет: ${player.highScore}"
             // Устанавливаем иконку знака зодиака
             val zodiacResId = getZodiacImageRes(player.zodiac)
             if (zodiacResId != null) {
