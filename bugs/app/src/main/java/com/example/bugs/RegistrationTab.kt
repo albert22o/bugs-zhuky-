@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
+import com.example.bugs.managers.PlayerManager
+import com.example.bugs.models.Player
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -14,12 +16,10 @@ class RegistrationTab : Fragment() {
     private lateinit var editTextName: EditText
     private lateinit var radioGroupGender: RadioGroup
     private lateinit var spinnerCourse: Spinner
-    private lateinit var seekBarDifficulty: SeekBar
     private lateinit var calendarViewBirth: CalendarView
     private lateinit var buttonRegister: Button
     private lateinit var textViewResult: TextView
     private lateinit var imageViewZodiac: ImageView
-    private lateinit var textDifficultyLabel: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,6 +41,7 @@ class RegistrationTab : Fragment() {
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, courses)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerCourse.adapter = adapter
+
 
         var birthDateMillis: Long = calendarViewBirth.date
 
@@ -74,32 +75,59 @@ class RegistrationTab : Fragment() {
             else "Не указан"
 
             val course = spinnerCourse.selectedItem.toString()
-            val difficulty = seekBarDifficulty.progress + 1
 
             val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
             val birthDateStr = sdf.format(Date(birthDateMillis))
             val zodiac = getZodiac(birthDateMillis)
 
+            val newPlayer = Player(
+                name = name,
+                gender = gender,
+                course = course,
+                birthDateMillis = birthDateMillis,
+                zodiac = zodiac
+            )
+
+            // 2. Добавляем игрока через менеджер
+            PlayerManager.addPlayer(newPlayer)
+
+            // 3. Показываем пользователю уведомление об успехе
+            Toast.makeText(requireContext(), "Игрок $name зарегистрирован!", Toast.LENGTH_SHORT).show()
+            // --- КОНЕЦ ИНТЕГРАЦИИ ---
+
+
+            // Отображение результата на экране (это можно оставить или убрать)
             textViewResult.text = """
                 ФИО: $name
                 Пол: $gender
                 Курс: $course
-                Уровень сложности: $difficulty
                 Дата рождения: $birthDateStr
                 Знак зодиака: $zodiac
             """.trimIndent()
 
             getZodiacImageRes(zodiac)?.let { imageViewZodiac.setImageResource(it) }
+
+            // Опционально: очистить форму после регистрации
+            // clearForm()
         }
 
         return view
+    }
+
+    private fun clearForm() {
+        editTextName.text.clear()
+        radioGroupGender.clearCheck()
+        spinnerCourse.setSelection(0)
+        textViewResult.text = ""
+        // calendarView можно сбросить на текущую дату, если нужно
+        calendarViewBirth.date = System.currentTimeMillis()
     }
 
     private fun getZodiac(birthMillis: Long): String {
         val cal = Calendar.getInstance()
         cal.timeInMillis = birthMillis
         val day = cal.get(Calendar.DAY_OF_MONTH)
-        val month = cal.get(Calendar.MONTH) + 1
+        val month = cal.get(Calendar.MONTH) + 1 // Месяцы в Calendar с 0
 
         return when {
             (month == 3 && day >= 21) || (month == 4 && day <= 19) -> "Овен"
