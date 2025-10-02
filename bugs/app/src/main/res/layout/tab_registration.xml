@@ -70,21 +70,8 @@
             android:layout_marginTop="4dp" />
 
         <!-- Уровень сложности -->
-        <TextView
-            android:id="@+id/textDifficultyLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Уровень сложности: 1"
-            android:textStyle="bold"
-            android:layout_marginTop="12dp" />
 
         <!-- Дата рождения -->
-        <SeekBar
-            android:id="@+id/seekBarDifficulty"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:max="10" />
 
         <TextView
             android:layout_width="wrap_content"

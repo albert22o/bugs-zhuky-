@@ -32,12 +32,10 @@ class RegistrationTab : Fragment() {
         editTextName = view.findViewById(R.id.editTextName)
         radioGroupGender = view.findViewById(R.id.radioGroupGender)
         spinnerCourse = view.findViewById(R.id.spinnerCourse)
-        seekBarDifficulty = view.findViewById(R.id.seekBarDifficulty)
         calendarViewBirth = view.findViewById(R.id.calendarViewBirth)
         buttonRegister = view.findViewById(R.id.buttonRegister)
         textViewResult = view.findViewById(R.id.textViewResult)
         imageViewZodiac = view.findViewById(R.id.imageViewZodiac)
-        textDifficultyLabel = view.findViewById(R.id.textDifficultyLabel)
 
         val courses = arrayOf("1 курс", "2 курс", "3 курс", "4 курс")
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, courses)
@@ -45,15 +43,6 @@ class RegistrationTab : Fragment() {
         spinnerCourse.adapter = adapter
 
         var birthDateMillis: Long = calendarViewBirth.date
-        textDifficultyLabel.text = "Уровень сложности: ${seekBarDifficulty.progress + 1}"
-
-        seekBarDifficulty.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                textDifficultyLabel.text = "Уровень сложности: ${progress + 1}"
-            }
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
 
         calendarViewBirth.setOnDateChangeListener { _, year, month, dayOfMonth ->
             val cal = Calendar.getInstance()
