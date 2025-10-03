@@ -1,39 +1,56 @@
 package com.example.bugs.managers
 
+import android.content.Context
 import android.util.Log
+import com.example.bugs.database.AppDatabase
 import com.example.bugs.models.Player
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-/**
- * Синглтон для управления списком зарегистрированных игроков.
- * Данные хранятся в оперативной памяти и будут доступны в течение всего жизненного цикла приложения.
- */
 object PlayerManager {
 
-    private val registeredPlayers = mutableListOf<Player>()
+
+    private lateinit var db: AppDatabase
+
+
+    fun initialize(context: Context) {
+        db = AppDatabase.getDatabase(context)
+    }
 
     /**
-     * Добавляет нового игрока в список.
+     * Добавляет нового игрока в базу данных.
      * @param player Объект игрока для добавления.
      */
     fun addPlayer(player: Player) {
-        registeredPlayers.add(player)
-        Log.i("PlayerManager", "Игрок добавлен: ${player.name}. Всего игроков: ${registeredPlayers.size}")
+        // Run database operations on a background thread using coroutines.
+        CoroutineScope(Dispatchers.IO).launch {
+            db.playerDao().addPlayer(player)
+            val playerCount = db.playerDao().getAllPlayers().size
+            Log.i("PlayerManager", "Игрок добавлен: ${player.name}. Всего игроков: $playerCount")
+        }
     }
 
     /**
-     * Возвращает неизменяемый список всех зарегистрированных игроков.
+     * Возвращает неизменяемый список всех зарегистрированных игроков из базы данных.
+     * This is a suspend function because it's a database read operation.
      * @return List<Player> список игроков.
      */
-    fun getPlayers(): List<Player> {
-        return registeredPlayers.toList() // Возвращаем копию, чтобы нельзя было изменить список извне
+    suspend fun getPlayers(): List<Player> {
+        return withContext(Dispatchers.IO) {
+            db.playerDao().getAllPlayers()
+        }
     }
 
     /**
-     * Очищает список всех игроков.
+     * Очищает список всех игроков в базе данных.
      */
     fun clearPlayers() {
-        registeredPlayers.clear()
-        Log.i("PlayerManager", "Список игроков очищен.")
+        CoroutineScope(Dispatchers.IO).launch {
+            db.playerDao().clearAllPlayers()
+            Log.i("PlayerManager", "Список игроков очищен.")
+        }
     }
 
     /**
@@ -42,16 +59,19 @@ object PlayerManager {
      * @param newScore Новый счет, полученный в игре.
      */
     fun updatePlayerHighScore(playerName: String, newScore: Int) {
-        val player = registeredPlayers.find { it.name == playerName }
-        if (player != null) {
-            if (newScore > player.highScore) {
-                player.highScore = newScore
-                Log.i("PlayerManager", "Новый рекорд для игрока ${player.name}: $newScore")
+        CoroutineScope(Dispatchers.IO).launch {
+            val player = db.playerDao().getPlayerByName(playerName)
+            if (player != null) {
+                if (newScore > player.highScore) {
+                    player.highScore = newScore
+                    db.playerDao().updatePlayer(player)
+                    Log.i("PlayerManager", "Новый рекорд для игрока ${player.name}: $newScore")
+                } else {
+                    Log.i("PlayerManager", "Счет игрока ${player.name} ($newScore) не превысил рекорд (${player.highScore})")
+                }
             } else {
-                Log.i("PlayerManager", "Счет игрока ${player.name} ($newScore) не превысил рекорд (${player.highScore})")
+                Log.w("PlayerManager", "Попытка обновить счет для несуществующего игрока: $playerName")
             }
-        } else {
-            Log.w("PlayerManager", "Попытка обновить счет для несуществующего игрока: $playerName")
         }
     }
 }

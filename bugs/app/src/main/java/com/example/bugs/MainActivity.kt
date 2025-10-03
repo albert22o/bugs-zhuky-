@@ -3,6 +3,7 @@ package com.example.bugs
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
+import com.example.bugs.managers.PlayerManager
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
@@ -10,6 +11,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        PlayerManager.initialize(this)
 
      setContentView(R.layout.activity_main)
         val viewPager: ViewPager2 = findViewById(R.id.viewPager)

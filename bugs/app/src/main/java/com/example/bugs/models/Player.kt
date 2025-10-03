@@ -1,6 +1,8 @@
 package com.example.bugs.models
 
 import android.os.Parcelable
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 import java.util.UUID
 
@@ -15,8 +17,9 @@ import java.util.UUID
  */
 
 @Parcelize
+@Entity(tableName = "players") // Marks this class as a database table
 data class Player(
-    val id: String = UUID.randomUUID().toString(), // Генерируем уникальный ID для каждого игрока
+    @PrimaryKey val id: String = UUID.randomUUID().toString(), // Marks this field as the primary key
     val name: String,
     val gender: String,
     val course: String,

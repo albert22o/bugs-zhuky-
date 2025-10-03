@@ -9,9 +9,11 @@ import android.widget.Button
 import android.widget.ListView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.bugs.com.example.bugs.PlayerListAdapter
 import com.example.bugs.managers.PlayerManager
 import com.example.bugs.models.Player
+import kotlinx.coroutines.launch
 
 class PlayerListTab : Fragment() {
 
@@ -21,7 +23,6 @@ class PlayerListTab : Fragment() {
 
     private var selectedPlayer: Player? = null
 
-    // ... (onCreateView и onResume остаются без изменений) ...
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,25 +40,27 @@ class PlayerListTab : Fragment() {
         super.onResume()
         updatePlayerList()
     }
-
     private fun updatePlayerList() {
-        val players = PlayerManager.getPlayers()
 
-        if (players.isEmpty()) {
-            textViewEmptyList.visibility = View.VISIBLE
-            listViewPlayers.visibility = View.GONE
-        } else {
-            textViewEmptyList.visibility = View.GONE
-            listViewPlayers.visibility = View.VISIBLE
-            val adapter = PlayerListAdapter(requireContext(), players)
-            listViewPlayers.adapter = adapter
-        }
+        viewLifecycleOwner.lifecycleScope.launch {
 
-        selectedPlayer = null
-        buttonPlay.visibility = View.GONE
-        // Для сброса выделения в ListView
-        listViewPlayers.adapter?.let {
-            listViewPlayers.setItemChecked(-1, true)
+            val players = PlayerManager.getPlayers()
+
+            if (players.isEmpty()) {
+                textViewEmptyList.visibility = View.VISIBLE
+                listViewPlayers.visibility = View.GONE
+            } else {
+                textViewEmptyList.visibility = View.GONE
+                listViewPlayers.visibility = View.VISIBLE
+                val adapter = PlayerListAdapter(requireContext(), players)
+                listViewPlayers.adapter = adapter
+            }
+
+            selectedPlayer = null
+            buttonPlay.visibility = View.GONE
+            listViewPlayers.adapter?.let {
+                listViewPlayers.setItemChecked(-1, true)
+            }
         }
     }
 
