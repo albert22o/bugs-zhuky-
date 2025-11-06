@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("kotlin-parcelize")
+    id("com.google.devtools.ksp") version "2.2.10-2.0.2"
 }
 
 android {
@@ -30,6 +32,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+
     }
     kotlinOptions {
         jvmTarget = "11"
@@ -40,7 +43,8 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.androidx.viewpager2)
+    implementation(libs.material)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -57,4 +61,9 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    implementation("androidx.room:room-runtime:2.8.1")
+    ksp("androidx.room:room-compiler:2.8.1")
+
+
 }
